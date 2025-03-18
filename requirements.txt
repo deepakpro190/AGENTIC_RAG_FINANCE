@@ -8,8 +8,8 @@ matplotlib==3.9.4
 seaborn==0.13.2
 statsmodels==0.14.4
 
-sqlite3>=3.35.0
-chromadb==0.4.24
+
+chromadb==0.4.15
 
 
 # Data handling and APIs
