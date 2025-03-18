@@ -8,6 +8,12 @@ from utils.chromadb_utils import query_chromadb
 from utils.voice_utils import transcribe_audio, speak_text
 from utils.plot_utils import plot_stock_trend
 import requests
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
+import sqlite3  # Now import sqlite3 normally
+
 MISTRAL_API_KEY = st.secrets["MISTRAL_API_KEY"]
 
 # ✅ Initialize session state for chat memory
