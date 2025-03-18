@@ -1,18 +1,28 @@
 import os
-import chromadb
-from transformers import AutoTokenizer
+import faiss
+import pickle
 import uuid
+import numpy as np
+from sentence_transformers import SentenceTransformer
 
-# Initialize ChromaDB
-chroma_client = chromadb.PersistentClient(path="./chroma_db")
-collection = chroma_client.get_or_create_collection(name="finance_docs")
+# Paths for FAISS index and metadata
+FAISS_INDEX_PATH = "faiss_index.bin"
+METADATA_PATH = "faiss_metadata.pkl"
 
-# Load Tokenizer (to check token limits)
-tokenizer = AutoTokenizer.from_pretrained("facebook/opt-1.3b")
-MAX_TOKENS = 1024  # Safe limit for OPT-1.3B
+# Load embedding model (can replace with OpenAI or other models)
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
+# Initialize FAISS index (or load existing one)
+if os.path.exists(FAISS_INDEX_PATH):
+    index = faiss.read_index(FAISS_INDEX_PATH)
+    with open(METADATA_PATH, "rb") as f:
+        metadata = pickle.load(f)
+else:
+    index = faiss.IndexFlatL2(model.get_sentence_embedding_dimension())
+    metadata = {}  # Dictionary to store document texts
 
 def embed_document(file_path):
-    """ Reads a text file, chunks it, and stores it in ChromaDB """
+    """ Reads a text file, generates embedding, and stores it in FAISS """
     if not os.path.exists(file_path):
         print(f"❌ Error: File '{file_path}' not found.")
         return
@@ -20,15 +30,24 @@ def embed_document(file_path):
     with open(file_path, "r", encoding="utf-8") as f:
         text = f.read()
     
-    # Truncate if needed
-    tokens = tokenizer.tokenize(text)
-    if len(tokens) > MAX_TOKENS:
-        text = tokenizer.convert_tokens_to_string(tokens[:MAX_TOKENS])
+    # Generate embedding
+    embedding = model.encode([text]).astype(np.float32)
+
+    # Assign a unique document ID
+    doc_id = str(uuid.uuid4())
     
-    doc_id = str(uuid.uuid4())  # Unique ID for the document
-    collection.add(ids=[doc_id], documents=[text])
-    
-    print(f"✅ Successfully embedded '{file_path}' into ChromaDB.")
+    # Add to FAISS index
+    index.add(embedding)
+
+    # Store text metadata
+    metadata[len(metadata)] = text
+
+    # Save updated FAISS index and metadata
+    faiss.write_index(index, FAISS_INDEX_PATH)
+    with open(METADATA_PATH, "wb") as f:
+        pickle.dump(metadata, f)
+
+    print(f"✅ Successfully embedded '{file_path}' into FAISS.")
 
 # Example Usage
 if __name__ == "__main__":
