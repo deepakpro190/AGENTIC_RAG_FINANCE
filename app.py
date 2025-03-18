@@ -4,7 +4,8 @@ from agents.query_analysis import analyze_query_with_llm
 from agents.stock_price import fetch_stock_price
 from agents.market_insights import analyze_stock_trends
 from agents.news_aggregator import fetch_financial_news
-from utils.chromadb_utils import query_chromadb
+from utils.faiss_utils import query_faiss
+
 from utils.voice_utils import transcribe_audio, speak_text
 from utils.plot_utils import plot_stock_trend
 import requests
@@ -29,7 +30,8 @@ def generate_response(user_query):
     """
     try:
         # ✅ Step 1: Retrieve documents from ChromaDB
-        docs = query_chromadb(user_query)
+        docs = query_faiss(user_query)
+
 
         if not docs:
             context = "No relevant documents found in ChromaDB."
