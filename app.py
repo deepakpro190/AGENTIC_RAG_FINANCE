@@ -12,7 +12,7 @@ __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
-import sqlite3  # Now import sqlite3 normally
+
 
 MISTRAL_API_KEY = st.secrets["MISTRAL_API_KEY"]
 
