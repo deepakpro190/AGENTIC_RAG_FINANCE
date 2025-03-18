@@ -246,4 +246,4 @@ if st.button("🔍 Get Answer"):
         #st.audio(speak_text(response), format="audio/mp3")
 
 st.sidebar.subheader("ℹ️ Info")
-st.sidebar.write("This **Finance RAG AI** retrieves finance documents from ChromaDB and uses **Mistral-7B** for answers.")
+st.sidebar.write("This **Finance RAG AI** retrieves finance documents from FAISS and uses **Mistral-7B** for answers.")
