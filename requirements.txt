@@ -8,11 +8,6 @@ matplotlib==3.9.4
 seaborn==0.13.2
 statsmodels==0.14.4
 
-pysqlite3-binary
-
-chromadb==0.4.14
-
-
 # Data handling and APIs
 requests==2.32.3
 yfinance==0.2.54
@@ -48,3 +43,7 @@ narwhals==1.30.0
 patsy==1.0.1
 pyparsing==3.2.1
 tzdata==2025.1
+
+# ✅ FAISS & Sentence Transformers for Vector Search
+faiss-cpu==1.8.0
+sentence-transformers==2.6.1
