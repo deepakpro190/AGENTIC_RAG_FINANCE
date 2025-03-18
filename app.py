@@ -9,9 +9,6 @@ from utils.faiss_utils import query_faiss
 from utils.voice_utils import transcribe_audio, speak_text
 from utils.plot_utils import plot_stock_trend
 import requests
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 
 
