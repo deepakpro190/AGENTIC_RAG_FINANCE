@@ -1,5 +1,6 @@
 import requests
 import json
+import streamlit as st
 MISTRAL_API_KEY = st.secrets["MISTRAL_API_KEY"]
 
 def analyze_query_with_llm(user_query):
