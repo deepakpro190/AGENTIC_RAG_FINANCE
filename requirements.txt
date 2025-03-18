@@ -8,6 +8,9 @@ matplotlib==3.9.4
 seaborn==0.13.2
 statsmodels==0.14.4
 
+chromadb==0.4.24
+
+
 # Data handling and APIs
 requests==2.32.3
 yfinance==0.2.54
