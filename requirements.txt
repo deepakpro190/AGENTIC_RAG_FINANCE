@@ -10,7 +10,7 @@ statsmodels==0.14.4
 
 pysqlite3-binary
 
-chromadb==0.4.24
+chromadb==0.4.14
 
 
 # Data handling and APIs
