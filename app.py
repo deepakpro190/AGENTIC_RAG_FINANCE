@@ -169,15 +169,11 @@ st.set_page_config(page_title="💰 Finance RAG AI", layout="wide")
 st.title("💰 Finance RAG AI - Chat Mode")
 
 # ✅ Display chat history
-'''for chat in st.session_state.chat_history:
+for chat in st.session_state.chat_history:
     with st.chat_message("user"):
         st.write(chat["user"])
     with st.chat_message("assistant"):
-        st.write(chat["bot"])'''
-for chat in st.session_state.chat_history:
-    with st.chat_message(chat["role"]):  # Dynamically set the role
-        st.write(chat["content"])
-
+        st.write(chat["bot"])
 
         
 col1, col2 = st.columns([8, 1])
@@ -236,11 +232,9 @@ if st.button("🔍 Get Answer"):
             response = generate_response(user_query)
 
         # ✅ Add to chat history
-        #st.session_state.chat_history.append({"user": user_query, "bot": response})
-        st.session_state.chat_history.extend([
-    {"role": "user", "content": user_query},
-    {"role": "assistant", "content": response}
-])
+        
+        st.session_state.chat_history.append({"user": user_query, "bot": response})
+       
 
         
         st.write(response)
