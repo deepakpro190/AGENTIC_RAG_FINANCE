@@ -42,7 +42,13 @@ def generate_response(user_query):
         ]
 
         # ✅ Step 3: Add previous chat history (if available)
-        chat_context.extend(st.session_state.chat_history)
+        chat_context.extend(
+            [
+                {"role": "user", "content": chat["user"]},
+                {"role": "assistant", "content": chat["bot"]}
+            ]
+            for chat in st.session_state.chat_history
+        )
 
         # ✅ Step 4: Call Mistral LLM
         response = requests.post(
