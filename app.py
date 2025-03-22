@@ -338,13 +338,13 @@ st.components.v1.html(
 )
 
 # ✅ Get voice input from URL parameters
-query_params = st.experimental_get_query_params()
-voice_text = query_params.get("voice_input", [""])[0]
+query_params = st.query_params
+voice_text = query_params.get("voice_input", "")
 
 # ✅ Update session state with voice input
 if voice_text:
     st.session_state.user_query = voice_text
-    st.experimental_rerun()
+    st.rerun()
 
 # ✅ User Input
 user_query = st.text_input("Type your message:", value=st.session_state.user_query, key=str(len(st.session_state.chat_history)))
@@ -384,11 +384,6 @@ if st.button("🔍 Get Answer"):
 
         # ✅ Clear input field
         st.session_state.user_query = ""
-
-st.sidebar.subheader("ℹ️ Info")
-st.sidebar.write("This **Finance RAG AI** retrieves finance documents from FAISS and uses **Mistral-7B** for answers.")
-
-        #st.audio(speak_text(response), format="audio/mp3")
 
 st.sidebar.subheader("ℹ️ Info")
 st.sidebar.write("This **Finance RAG AI** retrieves finance documents from FAISS and uses **Mistral-7B** for answers.")
