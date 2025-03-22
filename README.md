@@ -86,8 +86,8 @@ streamlit run app.py
 ## **🌐 Deployment on Streamlit Cloud**  
 
 🚀 Deploy this app on **Streamlit Cloud** using the following link:  
-🔗 **[https://agenticragfinance-uwcwzh6zxkhto9yzod5sed.streamlit.app/
-](#)** 
+🔗 [https://agenticragfinance-uwcwzh6zxkhto9yzod5sed.streamlit.app/
+]
 
 ---
 
