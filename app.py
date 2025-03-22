@@ -37,7 +37,7 @@ def generate_response(user_query):
 
         # ✅ Step 2: Maintain Chat Context
         chat_context = [
-            {"role": "system", "content": f"You are a finance AI assistant. Use the following information to assist the user:\n\n{context}"},
+            {"role": "system", "content": f"You are a finance AI assistant. Use your general knowledge and the following information to assist the user:\n\n{context}"},
             {"role": "user", "content": user_query}
         ]
 
