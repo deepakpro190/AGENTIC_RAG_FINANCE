@@ -233,7 +233,7 @@ if st.button("🔍 Get Answer"):
 
         # ✅ Add to chat history
         #st.session_state.chat_history.append({"user": user_query, "bot": response})
-        st.session_state.chat_history.append(
+        st.session_state.chat_history.extend(
             {"role": "user", "content": f"{user_query}"},
     {"role": "assistant", "content": "response"}
         )
