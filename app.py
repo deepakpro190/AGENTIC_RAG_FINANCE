@@ -1,4 +1,4 @@
-import streamlit as st
+'''import streamlit as st
 import yfinance as yf
 from agents.query_analysis import analyze_query_with_llm
 from agents.stock_price import fetch_stock_price
@@ -242,6 +242,151 @@ if st.button("🔍 Get Answer"):
             st.audio(audio_file, format="audio/mp3")
         else:
             st.error(audio_file)  # Show error message if TTS fails
+'''
+import streamlit as st
+import yfinance as yf
+import requests
+from agents.query_analysis import analyze_query_with_llm
+from agents.stock_price import fetch_stock_price
+from agents.market_insights import analyze_stock_trends
+from agents.news_aggregator import fetch_financial_news
+from utils.faiss_utils import query_faiss
+from utils.plot_utils import plot_stock_trend
+from utils.voice_utils import speak_text
+
+# ✅ Load API Key from Streamlit Secrets
+MISTRAL_API_KEY = st.secrets["MISTRAL_API_KEY"]
+
+# ✅ Initialize session state for chat history
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
+if "user_query" not in st.session_state:
+    st.session_state.user_query = ""
+
+# ✅ Function to generate LLM response
+def generate_response(user_query):
+    try:
+        docs = query_faiss(user_query)
+        context = "\n".join([f"- {doc}" for doc in docs])[:1024] if docs else "No relevant documents found."
+        
+        chat_context = [
+            {"role": "system", "content": f"You are a finance AI assistant. Use this information:\n\n{context}"},
+            {"role": "user", "content": user_query}
+        ]
+        chat_context.extend(st.session_state.chat_history)
+
+        response = requests.post(
+            "https://api.mistral.ai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {MISTRAL_API_KEY}"},
+            json={
+                "model": "open-mistral-7b",
+                "messages": chat_context,
+                "max_tokens": 200,
+                "temperature": 0.3,
+                "top_p": 1,
+            },
+        )
+
+        if response.status_code == 200:
+            return response.json()["choices"][0]["message"]["content"]
+        return f"❌ Error: {response.status_code} - {response.json()}"
+    except Exception as e:
+        return f"❌ Error in response generation: {str(e)}"
+
+# ✅ Set Streamlit page config
+st.set_page_config(page_title="💰 Finance RAG AI", layout="wide")
+st.title("💰 Finance RAG AI - Chat Mode")
+
+# ✅ Display chat history
+for chat in st.session_state.chat_history:
+    with st.chat_message("user"):
+        st.write(chat["user"])
+    with st.chat_message("assistant"):
+        st.write(chat["bot"])
+
+# ✅ JavaScript Speech-to-Text Component
+st.components.v1.html(
+    """
+    <script>
+        function startListening() {
+            var recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.start();
+
+            recognition.onresult = function(event) {
+                var speechText = event.results[0][0].transcript;
+                document.getElementById("output").value = speechText;
+                document.getElementById("hiddenInput").value = speechText;
+                document.getElementById("submit").click();
+            };
+
+            recognition.onerror = function(event) {
+                alert("Speech recognition error: " + event.error);
+            };
+        }
+    </script>
+
+    <button onclick="startListening()">🎙️ Speak</button>
+    <input type="text" id="output" readonly />
+    <form action="" method="get">
+        <input type="hidden" id="hiddenInput" name="voice_input" />
+        <input type="submit" id="submit" style="display: none;" />
+    </form>
+    """,
+    height=150
+)
+
+# ✅ Get voice input from URL parameters
+query_params = st.experimental_get_query_params()
+voice_text = query_params.get("voice_input", [""])[0]
+
+# ✅ Update session state with voice input
+if voice_text:
+    st.session_state.user_query = voice_text
+    st.experimental_rerun()
+
+# ✅ User Input
+user_query = st.text_input("Type your message:", value=st.session_state.user_query, key=str(len(st.session_state.chat_history)))
+
+if st.button("🔍 Get Answer"):
+    if user_query.strip():
+        st.session_state.user_query = user_query
+        st.write("🔄 **Processing...**")
+        
+        llm_result = analyze_query_with_llm(user_query)
+        
+        if llm_result["query_type"] == "stock_price":
+            response = "\n\n".join([fetch_stock_price(c["ticker"]) for c in llm_result["companies"]])
+        elif llm_result["query_type"] == "compare":
+            fig = analyze_stock_trends(llm_result["companies"])  
+            st.pyplot(fig)
+            stock_details = extract_stock_details(llm_result["companies"])
+            theoretical_analysis = generate_professional_stock_analysis(stock_details)
+            st.write("### 📊 Stock Performance & Financial Insights")
+            st.write(theoretical_analysis)
+            response = theoretical_analysis + "\n\n📊 See the stock performance comparison above."
+        elif llm_result["query_type"] == "news":
+            response = fetch_financial_news()
+        else:
+            response = generate_response(user_query)
+
+        # ✅ Add to chat history and display response
+        st.session_state.chat_history.append({"user": user_query, "bot": response})
+        st.write(response)
+
+        # ✅ Convert response to speech
+        audio_file = speak_text(response)
+        if isinstance(audio_file, str) and audio_file.endswith(".mp3"):
+            st.audio(audio_file, format="audio/mp3")
+        else:
+            st.error(audio_file)
+
+        # ✅ Clear input field
+        st.session_state.user_query = ""
+
+st.sidebar.subheader("ℹ️ Info")
+st.sidebar.write("This **Finance RAG AI** retrieves finance documents from FAISS and uses **Mistral-7B** for answers.")
 
         #st.audio(speak_text(response), format="audio/mp3")
 
