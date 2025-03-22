@@ -305,7 +305,7 @@ for chat in st.session_state.chat_history:
     with st.chat_message("assistant"):
         st.write(chat["bot"])
 
-# ✅ JavaScript Speech-to-Text Component
+# ✅ JavaScript for Speech-to-Text (Injects into Main Text Box)
 st.components.v1.html(
     """
     <script>
@@ -316,7 +316,7 @@ st.components.v1.html(
 
             recognition.onresult = function(event) {
                 var speechText = event.results[0][0].transcript;
-                document.getElementById("output").value = speechText;
+                document.getElementById("main_input").value = speechText;
                 document.getElementById("hiddenInput").value = speechText;
                 document.getElementById("submit").click();
             };
@@ -328,23 +328,22 @@ st.components.v1.html(
     </script>
 
     <button onclick="startListening()">🎙️ Speak</button>
-    <input type="text" id="output" readonly />
     <form action="" method="get">
         <input type="hidden" id="hiddenInput" name="voice_input" />
         <input type="submit" id="submit" style="display: none;" />
     </form>
     """,
-    height=150
+    height=100
 )
 
 # ✅ Get voice input from URL parameters
 query_params = st.query_params
 voice_text = query_params.get("voice_input", "")
 
-# ✅ Update session state with voice input
+# ✅ Populate main input field with speech if available
 if voice_text:
     st.session_state.user_query = voice_text
-    st.rerun()
+
 
 # ✅ User Input
 user_query = st.text_input("Type your message:", value=st.session_state.user_query, key=str(len(st.session_state.chat_history)))
