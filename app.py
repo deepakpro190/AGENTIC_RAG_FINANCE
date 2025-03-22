@@ -43,12 +43,7 @@ def generate_response(user_query):
 
         # ✅ Step 3: Add previous chat history (if available)
         chat_context.extend(
-            [
-                {"role": "user", "content": chat["user"]},
-                {"role": "assistant", "content": chat["bot"]}
-            ]
-            for chat in st.session_state.chat_history
-        )
+           st.session_state.chat_history)
 
         # ✅ Step 4: Call Mistral LLM
         response = requests.post(
@@ -237,7 +232,12 @@ if st.button("🔍 Get Answer"):
             response = generate_response(user_query)
 
         # ✅ Add to chat history
-        st.session_state.chat_history.append({"user": user_query, "bot": response})
+        #st.session_state.chat_history.append({"user": user_query, "bot": response})
+        st.session_state.chat_history.append(
+            {"role": "user", "content": f"{user_query}"},
+    {"role": "assistant", "content": "response"}
+        )
+        
         st.write(response)
          # ✅ Clear input field
         st.session_state.user_query = ""
