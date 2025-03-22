@@ -346,7 +346,7 @@ if voice_text:
 
 
 # ✅ User Input
-user_query = st.text_input("Type your message:", value=st.session_state.user_query, key=str(len(st.session_state.chat_history)))
+user_query = st.text_input("Type or Speak your message:", value=st.session_state.user_query, key="main_input")
 
 if st.button("🔍 Get Answer"):
     if user_query.strip():
