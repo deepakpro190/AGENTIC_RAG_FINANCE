@@ -55,9 +55,9 @@ def generate_response(user_query):
                 chat_context.append({"role": "assistant", "content": chat["bot"]})
                 last_role = "assistant"
 
-# ✅ Ensure last message is from "user"
-if last_role == "assistant":
-    chat_context.append({"role": "user", "content": "Continue."})  # Placeholder user input
+        # ✅ Ensure last message is from "user"
+        if last_role == "assistant":
+            chat_context.append({"role": "user", "content": "Continue."})  # Placeholder user input
 
         # ✅ Step 4: Call Mistral LLM
         response = requests.post(
