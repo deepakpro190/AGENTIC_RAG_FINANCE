@@ -240,7 +240,43 @@ if st.button("🔍 Get Answer"):
 
 
         elif llm_result["query_type"] == "news":
-            response = fetch_financial_news()
+            #response = fetch_financial_news()
+           
+            news_articles = fetch_financial_news()
+        
+            if news_articles:
+                # ✅ Format the news into a structured prompt
+                news_prompt = "Here are the latest financial news articles:\n\n"
+                for article in news_articles:
+                    news_prompt += f"🔹 **{article['title']}** ({article['source']})\n{article['content']}\n\n"
+        
+                news_prompt += "Summarize these news articles, highlighting key insights and market trends."
+        
+                # ✅ Call LLM for summarization
+                response = requests.post(
+                    "https://api.mistral.ai/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {MISTRAL_API_KEY}"},
+                    json={
+                        "model": "open-mistral-7b",
+                        "messages": [
+                            {"role": "system", "content": "You are a financial analyst providing key insights from news articles."},
+                            {"role": "user", "content": news_prompt},
+                        ],
+                        "max_tokens": 400,
+                        "temperature": 0.3,
+                        "top_p": 1,
+                        "stream": False,
+                    },
+                )
+        
+                if response.status_code == 200:
+                    response = response.json()["choices"][0]["message"]["content"]
+                else:
+                    response = f"❌ Error fetching news summary: {response.status_code} - {response.json()}"
+        
+            else:
+                response = "⚠️ No recent financial news found. Try again later!"
+
 
         else:
             response = generate_response(user_query)
