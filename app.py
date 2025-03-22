@@ -45,12 +45,19 @@ def generate_response(user_query):
         #chat_context.extend(
         #   st.session_state.chat_history)
         # ✅ Step 3: Add previous chat history (if available) and validate format
+        # ✅ Step 3: Add previous chat history (if available)
+        last_role = None  # Track last role to ensure correct format
         for chat in st.session_state.chat_history:
             if "user" in chat and chat["user"]:
                 chat_context.append({"role": "user", "content": chat["user"]})
+                last_role = "user"
             if "bot" in chat and chat["bot"]:  # Ensure bot response is not None
                 chat_context.append({"role": "assistant", "content": chat["bot"]})
+                last_role = "assistant"
 
+# ✅ Ensure last message is from "user"
+if last_role == "assistant":
+    chat_context.append({"role": "user", "content": "Continue."})  # Placeholder user input
 
         # ✅ Step 4: Call Mistral LLM
         response = requests.post(
